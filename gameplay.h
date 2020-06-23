@@ -4,6 +4,7 @@
 #define CELL_SIZE 30
 #define INTERVAL 25
 #define TOPHEIGHT 50
+#define BIAS 2
 
 
 #include <QDialog>
@@ -17,6 +18,7 @@
 #include <QPainter>
 #include <QTimer>
 #include <QString>
+#include <QMouseEvent>
 
 namespace Ui {
 class gameplay;
@@ -31,11 +33,19 @@ public:
     ~gameplay();
     void user_defined_dialog_set();
     void dia_init();
+    void cell_init();
     void minerandomset();
     void num_filled();
+
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *);
+    void mouseReleaseEvent(QMouseEvent *);
+    void mouseMoveEvent(QMouseEvent *);
+
     void timeadd();
+    int cal_num(int x, int y);//计算鼠标点击的cell
+    void restartgame();//重新开始本轮游戏
+    void openothers(int row, int col);
 
 private:
     Ui::gameplay *ui;
@@ -50,8 +60,15 @@ private:
     int mytime;//时间
     QTimer *timer;
 
-    bool start;//游戏是否开始，点击完第一个格子后游戏开始，同时计时
-    int end;//游戏是否结束，0：游戏未结束  1：succeed  2：failed
+    bool leftpress;
+    bool rightpress;
+    bool doublepress;
+    bool moveout;
+
+    int startnum;//鼠标点击的cell
+
+    bool gamestart;//游戏是否开始，点击完第一个格子后游戏开始，同时计时
+    int gameend;//游戏是否结束，0：游戏未结束  1：succeed  2：failed
 
     QMenuBar* menubar;
     QVector<cell> allcell;

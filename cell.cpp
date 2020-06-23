@@ -13,6 +13,7 @@ cell::cell(int n, int k)
     state = 0;
     num = n;
     kind = k;
+    press = false;
 }
 
 void cell::change_state(int changed_state)
@@ -46,4 +47,14 @@ int cell::get_kind()
 void cell::numadd()
 {
     num++;
+}
+
+void cell::setpress(bool p)
+{
+    press = p;
+}
+
+bool cell::getpress()
+{
+    return press;
 }

@@ -26,5 +26,6 @@
         <file>image/t9.png</file>
         <file>image/bomb.png</file>
         <file>image/great.png</file>
+        <file>image/errorbomb.png</file>
     </qresource>
 </RCC>
