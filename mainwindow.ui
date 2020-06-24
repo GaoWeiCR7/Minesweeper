@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>490</width>
-    <height>366</height>
+    <width>483</width>
+    <height>349</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -54,10 +54,10 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>120</x>
       <y>230</y>
-      <width>301</width>
-      <height>51</height>
+      <width>242</width>
+      <height>30</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -88,7 +88,6 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

@@ -2,7 +2,7 @@
 #define MODE_SELECT_H
 
 #include <QDialog>
-#include "gameplay.h"
+#include <QPainter>
 
 namespace Ui {
 class mode_select;
@@ -14,6 +14,8 @@ class mode_select : public QDialog
 
 public:
     explicit mode_select(bool lang,QWidget *parent = nullptr);
+    int getpat();
+    void paintEvent(QPaintEvent *);
     ~mode_select();
 
 private slots:
@@ -27,8 +29,7 @@ private slots:
 
 private:
     Ui::mode_select *ui;
-    gameplay* gamepl;
-    bool language;
+    int pattern;
 };
 
 #endif // MODE_SELECT_H

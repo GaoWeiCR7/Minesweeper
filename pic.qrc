@@ -27,5 +27,7 @@
         <file>image/bomb.png</file>
         <file>image/great.png</file>
         <file>image/errorbomb.png</file>
+        <file>image/title.png</file>
+        <file>image/mainpic.png</file>
     </qresource>
 </RCC>

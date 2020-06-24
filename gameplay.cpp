@@ -1,28 +1,52 @@
 #include "gameplay.h"
 #include "ui_gameplay.h"
 
-gameplay::gameplay(bool lang, int pat,QWidget *parent) :
+gameplay::gameplay(bool lang,QWidget *parent) :
     QDialog(parent),
     ui(new Ui::gameplay)
 {
     ui->setupUi(this);
     language = lang;
-    pattern = pat;
+    pattern = 0;
     Qt::WindowFlags flags=Qt::Dialog;
     flags |=Qt::WindowCloseButtonHint;
     this->setWindowFlags(flags);
     this->setWindowTitle("Minesweeper");
+    this->setWindowIcon(QIcon(":/new/prefix1/image/title.png"));
+    mode_sel = new mode_select(language,this);
+    user_def = new user_defined_input(language,this);
     menubar = new QMenuBar(this);
     QMenu* menu1 = new QMenu("Option",this);
 
-    QAction* mode_select = new QAction("mode",this);
+    QAction* mode_select_ac = new QAction("mode",this);
     QAction* music_volume = new QAction("volumn",this);
     QAction* tips = new QAction("tips",this);
 
-    menu1->addAction(mode_select);
+    connect(mode_select_ac,&QAction::triggered,this,&gameplay::dia_init);
+
+    menu1->addAction(mode_select_ac);
     menu1->addAction(music_volume);
     menu1->addAction(tips);
     menubar->addMenu(menu1);
+
+    timer = new QTimer(this);
+    connect(this->timer,&QTimer::timeout,this,&gameplay::timeadd);
+
+    QString runpath = QCoreApplication::applicationDirPath();
+    QString runpath1 =  runpath + "/bgm/City of the sky.mp3";
+    QString runpath2 =  runpath + "/bgm/The wizard of oz.mp3";
+    QString runpath3 =  runpath + "/bgm/Spirited away.mp3";
+
+    musiclist = new QMediaPlaylist(this);
+    music = new QMediaPlayer(this);
+
+    musiclist->addMedia(QUrl(runpath1));
+    musiclist->addMedia(QUrl(runpath2));
+    musiclist->addMedia(QUrl(runpath3));
+
+    music->setPlaylist(musiclist);
+    music->setVolume(80);
+    music->play();
 
     dia_init();
 }
@@ -32,8 +56,15 @@ gameplay::~gameplay()
     delete ui;
 }
 
+void gameplay::musicset()
+{
+
+}
+
 void gameplay::dia_init()
 {
+    if(mode_sel->exec() == QDialog::Accepted)
+        pattern = mode_sel->getpat();
     if(pattern == 0)
     {
         height = 9;
@@ -54,15 +85,13 @@ void gameplay::dia_init()
     }
     else
         user_defined_dialog_set();
-    this->setGeometry(350,200,width*CELL_SIZE,height*CELL_SIZE+INTERVAL+TOPHEIGHT);
-    this->setFixedSize(this->size());
+    //this->setGeometry(700,300,width*CELL_SIZE,height*CELL_SIZE+INTERVAL+TOPHEIGHT);
+    this->setFixedSize(width*CELL_SIZE,height*CELL_SIZE+INTERVAL+TOPHEIGHT);
     allcell.resize(height*width);
     cell_init();
     minerandomset();
     num_filled();
     mytime = 0;
-    timer = new QTimer(this);
-    connect(this->timer,&QTimer::timeout,this,&gameplay::timeadd);
     mine_left_num = minenum;
     gamestart = false;
     gameend = 0;
@@ -75,12 +104,14 @@ void gameplay::dia_init()
 
 void gameplay::user_defined_dialog_set()
 {
-    user_def = new user_defined_input(language,this);
     if(user_def->exec() == QDialog::Accepted)
     {
         height = user_def->get_height();
         width = user_def->get_width();
         minenum = user_def->get_minenum();
+        height = (height>9)?height:9;
+        width = (width>9)?width:9;
+        minenum = (minenum>10)?minenum:10;
     }
 }
 
@@ -142,6 +173,7 @@ void gameplay::paintEvent(QPaintEvent *)
     QPixmap image_question(":/new/prefix1/image/question mark.png");
     QPixmap image_errorbomb(":/new/prefix1/image/errorbomb.png");
     QPainter painter(this);
+    painter.drawPixmap(rect(),QPixmap(":/new/prefix1/image/mainpic.png"));
 
     int firsttime = mytime/100;
     int secondtime = (mytime%100)/10;
@@ -184,7 +216,7 @@ void gameplay::paintEvent(QPaintEvent *)
             if(allcell[i].getpress() == false)
                 painter.drawPixmap(column*CELL_SIZE,row*CELL_SIZE+INTERVAL+TOPHEIGHT,CELL_SIZE,CELL_SIZE,image_initcell);
             else
-                painter.drawPixmap(column*CELL_SIZE+BIAS,row*CELL_SIZE+INTERVAL+TOPHEIGHT+BIAS,CELL_SIZE,CELL_SIZE,image_initcell);
+                painter.drawPixmap(column*CELL_SIZE+BIAS,row*CELL_SIZE+INTERVAL+TOPHEIGHT+BIAS,CELL_SIZE-2*BIAS,CELL_SIZE-2*BIAS,image_initcell);
         }
         else if(allcell[i].get_state() == 1)
         {

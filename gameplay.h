@@ -4,7 +4,7 @@
 #define CELL_SIZE 30
 #define INTERVAL 25
 #define TOPHEIGHT 50
-#define BIAS 2
+#define BIAS 1
 
 
 #include <QDialog>
@@ -15,10 +15,12 @@
 #include "cell.h"
 #include <QVector>
 #include <ctime>
-#include <QPainter>
 #include <QTimer>
 #include <QString>
 #include <QMouseEvent>
+#include "mode_select.h"
+#include <QMediaPlayer>
+#include <QMediaPlaylist>
 
 namespace Ui {
 class gameplay;
@@ -29,7 +31,7 @@ class gameplay : public QDialog
     Q_OBJECT
 
 public:
-    explicit gameplay(bool lang,int pat,QWidget *parent = nullptr);
+    explicit gameplay(bool lang,QWidget *parent = nullptr);
     ~gameplay();
     void user_defined_dialog_set();
     void dia_init();
@@ -47,8 +49,11 @@ public:
     void restartgame();//重新开始本轮游戏
     void openothers(int row, int col);
 
+    void musicset();
+
 private:
     Ui::gameplay *ui;
+    mode_select* mode_sel;
     user_defined_input* user_def;
     bool language; //0: English   1:中文
     int pattern; // 0:easy  1:normal  2:hard  3: user-defined
@@ -72,6 +77,9 @@ private:
 
     QMenuBar* menubar;
     QVector<cell> allcell;
+
+    QMediaPlayer* music;
+    QMediaPlaylist* musiclist;
 };
 
 

@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "mode_select.h"
+#include "gameplay.h"
 
 namespace Ui {
 class MainWindow;
@@ -14,6 +14,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    void paintEvent(QPaintEvent *);
     ~MainWindow();
 
 private slots:
@@ -23,7 +24,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    mode_select* mode_sel;
+    gameplay * gamepl;
 };
 
 #endif // MAINWINDOW_H

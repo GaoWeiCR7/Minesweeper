@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>bgm/City of the sky.mp3</file>
+        <file>bgm/Spirited away.mp3</file>
+        <file>bgm/The wizard of oz.mp3</file>
+    </qresource>
+</RCC>
