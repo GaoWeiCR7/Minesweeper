@@ -11,8 +11,10 @@ gameplay::gameplay(bool lang,QWidget *parent) :
     Qt::WindowFlags flags=Qt::Dialog;
     flags |=Qt::WindowCloseButtonHint;
     this->setWindowFlags(flags);
-    this->setWindowTitle("Minesweeper");
-    this->setWindowIcon(QIcon(":/new/prefix1/image/title.png"));
+    if(language == false)
+        this->setWindowTitle("Minesweeper");
+    else
+        this->setWindowTitle("扫雷");
     mode_sel = new mode_select(language,this);
     user_def = new user_defined_input(language,this);
     menubar = new QMenuBar(this);
@@ -21,12 +23,26 @@ gameplay::gameplay(bool lang,QWidget *parent) :
     QAction* mode_select_ac = new QAction("mode",this);
     QAction* music_volume = new QAction("volumn",this);
     QAction* tips = new QAction("tips",this);
+    QAction* regame = new QAction("restart",this);
+
+    if(language == true)
+    {
+        menu1->setTitle("选项");
+        mode_select_ac->setText("模式选择");
+        music_volume->setText("音量调节");
+        tips->setText("建议");
+        regame->setText("重新开始");
+    }
 
     connect(mode_select_ac,&QAction::triggered,this,&gameplay::dia_init);
+    connect(music_volume,&QAction::triggered,this,&gameplay::musicset);
+    connect(tips,&QAction::triggered,this,&gameplay::providetips);
+    connect(regame,&QAction::triggered,this,&gameplay::restartgame);
 
     menu1->addAction(mode_select_ac);
     menu1->addAction(music_volume);
     menu1->addAction(tips);
+    menu1->addAction(regame);
     menubar->addMenu(menu1);
 
     timer = new QTimer(this);
@@ -48,23 +64,10 @@ gameplay::gameplay(bool lang,QWidget *parent) :
     music->setVolume(80);
     music->play();
 
-    dia_init();
-}
-
-gameplay::~gameplay()
-{
-    delete ui;
-}
-
-void gameplay::musicset()
-{
-
-}
-
-void gameplay::dia_init()
-{
     if(mode_sel->exec() == QDialog::Accepted)
+    {
         pattern = mode_sel->getpat();
+    }
     if(pattern == 0)
     {
         height = 9;
@@ -88,18 +91,182 @@ void gameplay::dia_init()
     //this->setGeometry(700,300,width*CELL_SIZE,height*CELL_SIZE+INTERVAL+TOPHEIGHT);
     this->setFixedSize(width*CELL_SIZE,height*CELL_SIZE+INTERVAL+TOPHEIGHT);
     allcell.resize(height*width);
-    cell_init();
-    minerandomset();
-    num_filled();
-    mytime = 0;
-    mine_left_num = minenum;
-    gamestart = false;
-    gameend = 0;
-    leftpress = false;
-    rightpress = false;
-    doublepress = false;
-    moveout = false;
-    startnum = -1;
+    restartgame();
+}
+
+gameplay::~gameplay()
+{
+    delete ui;
+}
+
+void gameplay::musicset()
+{
+    QDialog dia(this);
+    dia.setFixedSize(400,200);
+    Qt::WindowFlags flags=Qt::Dialog;
+    flags |=Qt::WindowCloseButtonHint;
+    dia.setWindowFlags(flags);
+    if(language == false)
+        dia.setWindowTitle("Volume");
+    else
+        dia.setWindowTitle("音量调节");
+
+    QPushButton isok(&dia);
+    QPushButton isno(&dia);
+    if(language == false)
+    {
+        isok.setText("ok");
+        isno.setText("cancel");
+    }
+    else
+    {
+        isok.setText("确定");
+        isno.setText("取消");
+    }
+    isok.move(80,150);
+    isno.move(230,150);
+    QString qss0="QPushButton {\
+    background-color: #CCCC99;\
+    border-style: outset;\
+    border-width: 2px;\
+    border-radius: 5px;\
+    border-color: #8B7355;\
+    font: bold 14px;\
+    min-width:2em;\
+    color:black;\
+    padding: 5px;\
+    }\
+    QPushButton:hover{\
+    background-color: #FFCCCC;\
+    }\
+    QPushButton:pressed {\
+    background-color: #99CCCC;\
+    border-style: inset;\
+    }\
+    QPushButton:!enabled{\
+    background-color: rgb(100, 100, 100);\
+    border-style: inset;\
+    }";
+    isok.setFixedSize(isok.size());
+    isno.setFixedSize(isno.size());
+    isok.setStyleSheet(qss0);
+    isno.setStyleSheet(qss0);
+
+    QSpinBox spinbox(&dia);
+    spinbox.setMinimum(0);
+    spinbox.setMaximum(100);
+    spinbox.setSingleStep(1);
+
+    QSlider slider(&dia);
+    slider.setOrientation(Qt::Horizontal);
+    slider.setMinimum(0);
+    slider.setMaximum(100);
+    slider.setSingleStep(1);
+    spinbox.move(50,50);
+    slider.move(150,50);
+    slider.setFixedWidth(200);
+    QString qss1 = "QSlider::groove:horizontal {\
+            border: 1px solid #4A708B;\
+            background: #C0C0C0;\
+            height: 5px;\
+            border-radius: 1px;\
+            padding-left:-1px;\
+            padding-right:-1px;\
+            }\
+            QSlider::sub-page:Horizontal \
+            {\
+                background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(231,80,229, 255), stop:1 rgba(7,208,255, 255));\
+                height:4px;\
+            }\
+            QSlider::add-page:Horizontal\
+                 {     \
+                    background-color: rgb(87, 97, 106);\
+                    height:4px;\
+                 }\
+            QSlider::handle:horizontal\
+            {\
+                background: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5,\
+                stop:0.6 #45ADED, stop:0.778409 rgba(255, 255, 255, 255));\
+                width: 11px;\
+                margin-top: -3px;\
+                margin-bottom: -3px;\
+                border-radius: 5px;\
+            }";
+    slider.setStyleSheet(qss1);
+    connect(&spinbox, SIGNAL(valueChanged(int)), &slider, SLOT(setValue(int)));
+    connect(&slider, SIGNAL(valueChanged(int)), &spinbox, SLOT(setValue(int)));
+    spinbox.setValue(music->volume());
+    connect(&isok,&QPushButton::clicked,&dia,&QDialog::accept);
+    connect(&isno,&QPushButton::clicked,&dia,&QDialog::close);
+
+    if(dia.exec() == QDialog::Accepted)
+    {
+        music->setVolume(slider.value());
+    }
+}
+
+void gameplay::providetips()
+{
+    QDialog dia(this);
+    //dia.setFixedSize(400,200);
+    Qt::WindowFlags flags=Qt::Dialog;
+    flags |=Qt::WindowCloseButtonHint;
+    dia.setWindowFlags(flags);
+    if(language == false)
+        dia.setWindowTitle("Tips");
+    else
+        dia.setWindowTitle("建议");
+    QLabel label(&dia);
+
+    //label.setFixedSize(dia.size());
+    label.setStyleSheet("background: white;");
+    if(language == true)
+        label.setText("tip1:\n如果您认为某个方块可能藏有地雷，请右键单击它。这会在该方块上做一个旗标。（如果不确定，请再次右键单击标记为问号。）\n\
+tip2:\n如果一行中有三个方块显示为2-3-2，您就会知道该行旁边可能排列着三个雷。如果一个方块显示为 8，则它周围的每个方块下面都有一个雷。\n\
+tip3:\n如果不确定下一个单击位置，可以尝试清除某些未探测的区域。在未标记方块的中间单击比在可能有雷的区域单击要好一些。\n");
+    else
+        label.setText("tip1:\nIf you think a cell might be mined, right-click it. This will make a flag on the square. (If not, right-click again and mark as a question mark.)\n\
+tip2:\nIf there are three cells in a row that appear as 2-3-2, you know that there might be three mines lined up next to the row. If a cell appears as 8, there is a mine under each cell around it.\n\
+tip3:\nIf you are not sure where to place a click, you can try to clear some unexplored areas. It is better to click in the middle of an unmarked cell than in a cell that may be mined.\n");
+    label.setAlignment(Qt::AlignTop);
+    label.setWordWrap(true);
+    label.setFont(QFont("宋体" , 10 ));
+    label.setMargin(10);
+    label.adjustSize();
+    dia.setFixedSize(label.size());
+    dia.exec();
+}
+
+void gameplay::dia_init()
+{
+    if(mode_sel->exec() == QDialog::Accepted)
+    {
+        pattern = mode_sel->getpat();
+        if(pattern == 0)
+        {
+            height = 9;
+            width = 9;
+            minenum = 10;
+        }
+        else if(pattern == 1)
+        {
+            height = 16;
+            width = 16;
+            minenum = 40;
+        }
+        else if (pattern == 2)
+        {
+            height = 16;
+            width = 30;
+            minenum = 99;
+        }
+        else
+            user_defined_dialog_set();
+        //this->setGeometry(700,300,width*CELL_SIZE,height*CELL_SIZE+INTERVAL+TOPHEIGHT);
+        this->setFixedSize(width*CELL_SIZE,height*CELL_SIZE+INTERVAL+TOPHEIGHT);
+        allcell.resize(height*width);
+        restartgame();
+    }
 }
 
 void gameplay::user_defined_dialog_set()
@@ -213,10 +380,10 @@ void gameplay::paintEvent(QPaintEvent *)
         int column = i%width;
         if(allcell[i].get_state() == 0)
         {
-            if(allcell[i].getpress() == false)
-                painter.drawPixmap(column*CELL_SIZE,row*CELL_SIZE+INTERVAL+TOPHEIGHT,CELL_SIZE,CELL_SIZE,image_initcell);
-            else
+            if(allcell[i].getpress() == true&&gameend == 0)
                 painter.drawPixmap(column*CELL_SIZE+BIAS,row*CELL_SIZE+INTERVAL+TOPHEIGHT+BIAS,CELL_SIZE-2*BIAS,CELL_SIZE-2*BIAS,image_initcell);
+            else
+                painter.drawPixmap(column*CELL_SIZE,row*CELL_SIZE+INTERVAL+TOPHEIGHT,CELL_SIZE,CELL_SIZE,image_initcell);
         }
         else if(allcell[i].get_state() == 1)
         {
@@ -536,4 +703,5 @@ void gameplay::restartgame()
     doublepress = false;
     moveout = false;
     startnum = -1;
+    update();
 }

@@ -21,6 +21,9 @@
 #include "mode_select.h"
 #include <QMediaPlayer>
 #include <QMediaPlaylist>
+#include <QPushButton>
+#include <QSlider>
+#include <QSpinBox>
 
 namespace Ui {
 class gameplay;
@@ -50,6 +53,7 @@ public:
     void openothers(int row, int col);
 
     void musicset();
+    void providetips();
 
 private:
     Ui::gameplay *ui;

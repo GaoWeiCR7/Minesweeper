@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
     flags |=Qt::WindowCloseButtonHint;
     this->setWindowFlags(flags);
     this->setFixedSize(this->size());
+    this->setWindowIcon(QIcon(":/new/prefix1/image/title.png"));
 }
 
 void MainWindow::paintEvent(QPaintEvent* )
