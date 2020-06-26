@@ -24,6 +24,7 @@
 #include <QPushButton>
 #include <QSlider>
 #include <QSpinBox>
+#include <QMessageBox>
 
 namespace Ui {
 class gameplay;

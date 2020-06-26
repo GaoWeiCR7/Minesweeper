@@ -11,6 +11,7 @@ gameplay::gameplay(bool lang,QWidget *parent) :
     Qt::WindowFlags flags=Qt::Dialog;
     flags |=Qt::WindowCloseButtonHint;
     this->setWindowFlags(flags);
+    this->setWindowIcon(QIcon(":/new/prefix1/image/title.png"));
     if(language == false)
         this->setWindowTitle("Minesweeper");
     else
@@ -276,6 +277,8 @@ void gameplay::user_defined_dialog_set()
         height = user_def->get_height();
         width = user_def->get_width();
         minenum = user_def->get_minenum();
+        if(height<9||width<9||minenum<10)
+            QMessageBox::information(nullptr,"提示","自定义设置过于简单！");
         height = (height>9)?height:9;
         width = (width>9)?width:9;
         minenum = (minenum>10)?minenum:10;
@@ -640,11 +643,21 @@ void gameplay::mouseReleaseEvent(QMouseEvent *event)
             {
                 gameend = 2;
                 timer->stop();
+                if(language == false)
+                    QMessageBox::about(nullptr,"Failure","You have not passed the game!");
+                else
+                    QMessageBox::about(nullptr,"失败","你没有通过游戏！");
                 break;
             }
         }
         if(gameend == 1)
+        {
             timer->stop();
+            if(language == false)
+                QMessageBox::about(nullptr,"Success","You have passed the game Successfully!");
+            else
+                QMessageBox::about(nullptr,"成功","你已经成功通过游戏！");
+        }
     }
     update();
 }

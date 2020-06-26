@@ -52,13 +52,13 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_clicked()
 {
     this->hide();
-    gamepl = new gameplay(false,this);
-    gamepl->show();
+    gameplay gamepl(false);
+    gamepl.exec();
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
     this->hide();
-    gamepl = new gameplay(true,this);
-    gamepl->show();
+    gameplay gamepl(true);
+    gamepl.exec();
 }

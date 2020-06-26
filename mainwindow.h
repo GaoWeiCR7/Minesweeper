@@ -24,7 +24,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    gameplay * gamepl;
 };
 
 #endif // MAINWINDOW_H
